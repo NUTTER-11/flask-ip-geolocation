@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Location Map</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+    <style>
+        #map {
+            height: 400px;
+            width: 100%;
+        }
+    </style>
+</head>
+<body>
+    <h1>Location Map</h1>
+    <div id="map"></div>
+
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+    <script>
+        // Ensure that the latitude and longitude are passed as strings and parsed correctly in JavaScript
+        const latitude = parseFloat("{{ data['lat'] | safe }}");
+        const longitude = parseFloat("{{ data['lon'] | safe }}");
+
+        // Initialize the map and set its view to the captured latitude and longitude
+        const map = L.map('map').setView([latitude, longitude], 13);
+
+        // Set the tile layer for the map (using OpenStreetMap)
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+        }).addTo(map);
+
+        // Add a marker to the map at the captured latitude and longitude
+        L.marker([latitude, longitude]).addTo(map)
+            .bindPopup('You are here')
+            .openPopup();
+    </script>
+</body>
+</html>
