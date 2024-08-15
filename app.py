@@ -1,17 +1,21 @@
-from flask import Flask, request, render_template
-import requests
+from flask import Flask, render_template, request
+from flask_socketio import SocketIO
 
 app = Flask(__name__)
-
-def get_geolocation(ip):
-    response = requests.get(f"http://ip-api.com/json/{ip}")
-    return response.json()
+app.config['SECRET_KEY'] = '162f203e4329d0df88adde0ff2b2e712'
+socketio = SocketIO(app)
 
 @app.route('/')
 def index():
-    ip = request.remote_addr  # Capture the IP address of the visitor
-    location_data = get_geolocation(ip)  # Get location data
-    return render_template('map.html', data=location_data)
+    return render_template('map.html')
+
+@socketio.on('send-location')
+def handle_location(data):
+    socketio.emit('receive-location', data)
+
+@socketio.on('disconnect')
+def handle_disconnect():
+    socketio.emit('user-disconnected', request.sid)
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5000)
+    socketio.run(app, host='0.0.0.0', port=5000)
